@@ -61,7 +61,6 @@ int main()
 void ciclo_menu(void) {
     int opt = 0;
     int nEmbaixadores = 0;
-    int TST=0;
     int nVisita = 0;
     Embaixador embaixador[MAX_EMBAIXADORES];
     Visita visita[MAX_VISITAS]; 
