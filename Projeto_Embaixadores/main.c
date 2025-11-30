@@ -61,6 +61,7 @@ int main()
 void ciclo_menu(void) {
     int opt = 0;
     int nEmbaixadores = 0;
+    int TST=0;
     int nVisita = 0;
     Embaixador embaixador[MAX_EMBAIXADORES];
     Visita visita[MAX_VISITAS]; 
@@ -212,6 +213,10 @@ void adicionar_visita(Visita lista_visita[], int *nVisita) {
     (*nVisita)++;
     printf("Visita adicionada com sucesso!\n");
 }
+
+
+
+
 // -------------------- LISTAR VISITAS ----------------
 void listar_visitas(Visita lista_visitas[], int nVisitas) {
     if (nVisitas == 0) {
