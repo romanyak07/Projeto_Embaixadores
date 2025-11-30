@@ -18,14 +18,17 @@ typedef struct visita {
     int ano;
 }Visita;
 
+
+
 #define MAX_EMBAIXADORES 100
+#define MAX_VISITAS 1000
 
 void ciclo_menu(void);
-void listar_visitas(int filtro);
+void listar_visitas(Visita lista_visita[], int nVisitas);
 void listar_embaixadores(Embaixador lista[], int nEmbaixadores);
 void consultar_visita(void);
 void consultar_embaixador(void);
-void adicionar_visita(void);
+void adicionar_visita(Visita visita[], int *nVisita);
 void adicionar_embaixador(Embaixador lista[], int *nEmbaixadores);
 void autorizar_visita(void);
 void cancelar_visita(void);
@@ -61,8 +64,9 @@ int main()
 void ciclo_menu(void) {
     int opt = 0;
     int nEmbaixadores = 0;
+    int nVisita = 0;
     Embaixador embaixador[MAX_EMBAIXADORES];
-
+    Visita visita[MAX_VISITAS]; 
     do {
         printf("\n=== Menu E-IPS ===\n");
         printf("1. Listar visitas (total)\n");
@@ -86,11 +90,11 @@ void ciclo_menu(void) {
         printf("Escolha: ");
         scanf("%d",&opt);
         switch (opt) {
-            case 1: listar_visitas(0); break;
+            case 1: listar_visitas(visita , nVisita); break;
             case 2: listar_embaixadores(embaixador, nEmbaixadores); break;
             case 3: consultar_visita(); break;
             case 4: consultar_embaixador(); break;
-            case 5: adicionar_visita(); break;
+            case 5: adicionar_visita(visita, &nVisita); break;
             case 6: adicionar_embaixador(embaixador, &nEmbaixadores); break;
             case 7: autorizar_visita(); break;
             case 8: cancelar_visita(); break;
@@ -195,9 +199,59 @@ void listar_embaixadores(Embaixador lista[], int nEmbaixadores) {
     }
 }
 
+
+
+void adicionar_visita(Visita lista_visita[], int *nVisita) {
+    static int proxID = 1;
+
+    if (*nVisita >= MAX_VISITAS) {
+        printf("Limite de visitas atingido!\n");
+        return;
+    }
+
+    Visita v;
+    v.id = proxID++;
+    printf("Insira o local da visita: ");
+    scanf(" %99[^\n]", v.local);
+    printf("Insira a data da visita (dd mm aaaa): ");
+    scanf("%d %d %d", &v.dia, &v.mes, &v.ano);
+    strcpy(v.estado, "em planeamento");
+
+    // Adiciona à lista
+    lista_visita[*nVisita] = v;
+    (*nVisita)++;
+    printf("Visita adicionada com sucesso!\n");
+
+}
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
 // Funções stub para evitar erros de ligação
-void listar_visitas(int filtro) {
-    printf("Funcionalidade não implementada.\n");
+void listar_visitas(Visita lista_visitas[], int nVisitas) {
+    if (nVisitas == 0) {
+        printf("Nenhuma visita registada.\n");
+        return;
+    }
+    for (int i = 0; i < nVisitas ; i++) {
+        printf("ID - %d, Estado: %s, Local: %s, data: %d - %d - %d\n",
+            lista_visitas[i].id,
+            lista_visitas[i].estado,
+            lista_visitas[i].local,
+            lista_visitas[i].dia,
+            lista_visitas[i].mes,
+            lista_visitas[i].ano);
+    }
 }
 
 void consultar_visita(void) {
@@ -208,9 +262,7 @@ void consultar_embaixador(void) {
     printf("Funcionalidade não implementada.\n");
 }
 
-void adicionar_visita(void) {
-    printf("Funcionalidade não implementada.\n");
-}
+
 
 void autorizar_visita(void) {
     printf("Funcionalidade não implementada.\n");
