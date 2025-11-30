@@ -30,8 +30,8 @@ void consultar_visita(void);
 void consultar_embaixador(void);
 void adicionar_visita(Visita visita[], int *nVisita);
 void adicionar_embaixador(Embaixador lista[], int *nEmbaixadores);
-void autorizar_visita(void);
-void cancelar_visita(void);
+void autorizar_visita(Visita lista_visita[], int nVisitas);
+void cancelar_visita(Visita lista_visita[], int nVisitas);
 void confirmar_realizacao(void);
 void alterar_info_visita(void);
 void alterar_info_embaixador(void);
@@ -96,8 +96,8 @@ void ciclo_menu(void) {
             case 4: consultar_embaixador(); break;
             case 5: adicionar_visita(visita, &nVisita); break;
             case 6: adicionar_embaixador(embaixador, &nEmbaixadores); break;
-            case 7: autorizar_visita(); break;
-            case 8: cancelar_visita(); break;
+            case 7: autorizar_visita(visita , nVisita); break;
+            case 8: cancelar_visita(visita , nVisita); break;
             case 9: confirmar_realizacao(); break;
             case 10: alterar_info_visita(); break;
             case 11: alterar_info_embaixador(); break;
@@ -215,7 +215,10 @@ void adicionar_visita(Visita lista_visita[], int *nVisita) {
     scanf(" %99[^\n]", v.local);
     printf("Insira a data da visita (dd mm aaaa): ");
     scanf("%d %d %d", &v.dia, &v.mes, &v.ano);
-    strcpy(v.estado, "em planeamento");
+    // usamos um código de estado por um único carácter para simplificar comparações
+    // 'e' = em planeamento, 'a' = autorizada, 'c' = cancelada, 'r' = realizada
+    v.estado[0] = 'e';
+    v.estado[1] = '\0';
 
     // Adiciona à lista
     lista_visita[*nVisita] = v;
@@ -244,9 +247,15 @@ void listar_visitas(Visita lista_visitas[], int nVisitas) {
         return;
     }
     for (int i = 0; i < nVisitas ; i++) {
+        const char *estado_txt = "desconhecido";
+        if (lista_visitas[i].estado[0] == 'e') estado_txt = "em planeamento";
+        else if (lista_visitas[i].estado[0] == 'a') estado_txt = "autorizada";
+        else if (lista_visitas[i].estado[0] == 'c') estado_txt = "cancelada";
+        else if (lista_visitas[i].estado[0] == 'r') estado_txt = "realizada";
+
         printf("ID - %d, Estado: %s, Local: %s, data: %d - %d - %d\n",
             lista_visitas[i].id,
-            lista_visitas[i].estado,
+            estado_txt,
             lista_visitas[i].local,
             lista_visitas[i].dia,
             lista_visitas[i].mes,
@@ -264,12 +273,93 @@ void consultar_embaixador(void) {
 
 
 
-void autorizar_visita(void) {
-    printf("Funcionalidade não implementada.\n");
+void autorizar_visita(Visita lista_visita[], int nVisitas) {
+    int id = 0;
+    int i = 0;
+    char c = 0;
+    
+    printf("Indique o ID da visita a autorizar: ");
+    scanf("%d", &id);
+    
+    // Procurar a visita no array
+    for (i = 0; i < nVisitas; i++) {
+        if (lista_visita[i].id == id) {
+            // Verificar se está em estado de planeamento
+            if (lista_visita[i].estado[0] != 'e') {
+                const char *estado_txt = "desconhecido";
+                if (lista_visita[i].estado[0] == 'a') estado_txt = "autorizada";
+                else if (lista_visita[i].estado[0] == 'c') estado_txt = "cancelada";
+                else if (lista_visita[i].estado[0] == 'r') estado_txt = "realizada";
+                printf("A visita ID %d não está em planeamento. Estado atual: %s\n", id, estado_txt);
+                return;
+            }
+            
+            // Pedir confirmação
+            printf("Gostaria de autorizar a visita? (s/n): ");
+            scanf(" %c", &c);  // Espaço antes de %c
+            
+            if(c != 's' && c != 'S' && c != 'n' && c != 'N') {
+                printf("Opção inválida. Operação cancelada.\n");
+                return;
+            }
+            
+            if(c == 's' || c == 'S') {
+                lista_visita[i].estado[0] = 'a';
+                lista_visita[i].estado[1] = '\0';
+                printf("Visita ID %d autorizada com sucesso.\n", id);
+            } else {
+                printf("Operação cancelada pelo utilizador.\n");
+            }
+            return;
+        }
+    }
+    
+    printf("Erro: nenhuma visita com ID %d encontrada.\n", id);
 }
 
-void cancelar_visita(void) {
-    printf("Funcionalidade não implementada.\n");
+
+void cancelar_visita(Visita lista_visita[], int nVisitas) {
+    int id = 0;
+    int i = 0;
+    char c = 0;
+    
+    printf("Indique o ID da visita a cancelar: ");
+    scanf("%d", &id);
+    
+    // Procurar a visita no array
+    for (i = 0; i < nVisitas; i++) {
+        if (lista_visita[i].id == id) {
+            // Verificar se está em estado de planeamento
+            if (lista_visita[i].estado[0] != 'e') {
+                const char *estado_txt = "desconhecido";
+                if (lista_visita[i].estado[0] == 'a') estado_txt = "autorizada";
+                else if (lista_visita[i].estado[0] == 'c') estado_txt = "cancelada";
+                else if (lista_visita[i].estado[0] == 'r') estado_txt = "realizada";
+                printf("A visita ID %d não está em planeamento. Estado atual: %s\n", id, estado_txt);
+                return;
+            }
+            
+            // Pedir confirmação
+            printf("Gostaria de cancelar a visita? (s/n): ");
+            scanf(" %c", &c); 
+            
+            if(c != 's' && c != 'S' && c != 'n' && c != 'N') {
+                printf("Opção inválida. Operação cancelada.\n");
+                return;
+            }
+            
+            if(c == 's' || c == 'S') {
+                lista_visita[i].estado[0] = 'c';
+                lista_visita[i].estado[1] = '\0';
+                printf("Visita ID %d cancelada com sucesso.\n", id);
+            } else {
+                printf("Operação cancelada pelo utilizador.\n");
+            }
+            return;
+        }
+    }
+    
+    printf("Erro: nenhuma visita com ID %d encontrada.\n", id);
 }
 
 void confirmar_realizacao(void) {
