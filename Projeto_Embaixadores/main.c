@@ -3,8 +3,7 @@
 #include <ctype.h>
 #include <time.h>
 
-void alterar_info_visita(void) { printf("Funcionalidade não implementada.\n"); }
-void alterar_info_embaixador(void) { printf("Funcionalidade não implementada.\n"); }
+
 void eliminar_visita(void) { printf("Funcionalidade não implementada.\n"); }
 void eliminar_embaixador(void) { printf("Funcionalidade não implementada.\n"); }
 void gravar_dados(void) { printf("Funcionalidade não implementada.\n"); }
@@ -43,8 +42,8 @@ void adicionar_embaixador(Embaixador lista[], int *nEmbaixadores);
 void autorizar_visita(Visita lista_visita[], int nVisitas);
 void cancelar_visita(Visita lista_visita[], int nVisitas);
 void confirmar_realizacao(Visita lista_visita[], int nVisitas);
-void alterar_info_visita(void);
-void alterar_info_embaixador(void);
+void alterar_visita(Visita lista_visita[], int nVisitas);
+void alterar_embaixador(Embaixador lista[], int nEmbaixadores);
 void eliminar_visita(void);
 void eliminar_embaixador(void);
 void gravar_dados(void);
@@ -98,8 +97,8 @@ void ciclo_menu(void) {
             case 7: autorizar_visita(visita , nVisita); break;
             case 8: cancelar_visita(visita , nVisita); break;
             case 9: confirmar_realizacao(visita , nVisita); break;
-            case 10: alterar_info_visita(); break;
-            case 11: alterar_info_embaixador(); break;
+            case 10: alterar_visita(visita , nVisita); break;
+            case 11: alterar_embaixador(embaixador, nEmbaixadores); break;
             case 12: eliminar_visita(); break;
             case 13: eliminar_embaixador(); break;
             case 14: gravar_dados(); break;
@@ -395,4 +394,141 @@ void consultar_embaixador(Embaixador lista[], int nEmbaixadores) {
     }
 
     printf("Embaixador não encontrado.\n");
+}
+
+// ---------------- ALTERAR VISITA ----------------
+void alterar_visita(Visita lista_visita[], int nVisitas) 
+{
+    int id = 0;
+    int i = 0;
+    printf("Insira o ID da visita a alterar: ");
+    if (scanf("%d", &id) != 1) {
+        printf("Entrada inválida.\n");
+        while (getchar() != '\n');
+        return;
+    }
+
+    for (i = 0; i < nVisitas; i++) {
+        if (lista_visita[i].id == id) {
+            printf("1. Alterar local\n2. Alterar data\n3. Alterar estado\nEscolha: ");
+            int opt = 0;
+            if (scanf("%d", &opt) != 1) {
+                printf("Entrada inválida.\n");
+                while (getchar() != '\n');
+                return;
+            }
+            while (getchar() != '\n');
+
+            if (opt == 1) {
+                printf("Novo local: ");
+                scanf(" %99[^\n]", lista_visita[i].local);
+                printf("Local alterado.\n");
+            } else if (opt == 2) {
+                int d, m, y;
+                printf("Insira a nova data (dd mm aaaa): ");
+                if (scanf("%d %d %d", &d, &m, &y) != 3) {
+                    printf("Data inválida.\n");
+                    while (getchar() != '\n');
+                    return;
+                }
+                lista_visita[i].dia = d;
+                lista_visita[i].mes = m;
+                lista_visita[i].ano = y;
+                printf("Data alterada.\n");
+            } else if (opt == 3) {
+                char c;
+                printf("Estados: e=em planeamento, a=autorizada, c=cancelada, r=realizada\n");
+                printf("Insira código do novo estado: ");
+                scanf(" %c", &c);
+                if (c != 'e' && c != 'a' && c != 'c' && c != 'r') {
+                    printf("Estado inválido.\n");
+                    return;
+                }
+                lista_visita[i].estado[0] = c;
+                lista_visita[i].estado[1] = '\0';
+                printf("Estado alterado.\n");
+            } else {
+                printf("Opção inválida.\n");
+            }
+            return;
+        }
+    }
+
+    printf("Visita não encontrada.\n");
+
+}
+
+// ---------------- ALTERAR EMBAIXADOR ----------------
+void alterar_embaixador(Embaixador lista[], int nEmbaixadores) 
+{ 
+    int numero = 0;
+    int i = 0;
+    printf("Insira o número do embaixador a alterar: ");
+    if (scanf("%d", &numero) != 1) {
+        printf("Entrada inválida.\n");
+        while (getchar() != '\n');
+        return;
+    }
+
+    for (i = 0; i < nEmbaixadores; i++) {
+        if (lista[i].numero == numero) {
+            printf("1. Alterar nome\n2. Alterar escola\n3. Alterar NIF\nEscolha: ");
+            int opt = 0;
+            if (scanf("%d", &opt) != 1) {
+                printf("Entrada inválida.\n");
+                while (getchar() != '\n');
+                return;
+            }
+            while (getchar() != '\n');
+
+            if (opt == 1) {
+                printf("Novo nome: ");
+                scanf(" %49[^\n]", lista[i].nome);
+                printf("Nome alterado.\n");
+            } else if (opt == 2) {
+                printf("Nova escola (ESTS/ESTB/ESE/ESCE/ESS): ");
+                scanf(" %4s", lista[i].escola);
+                printf("Escola alterada.\n");
+            } else if (opt == 3) {
+                char nif[10];
+                int valido = 0;
+                while (!valido) {
+                    printf("Novo NIF (9 dígitos): ");
+                    scanf(" %9s", nif);
+                    if (strlen(nif) != 9) {
+                        printf("NIF inválido! Deve ter 9 dígitos.\n");
+                        continue;
+                    }
+                    valido = 1;
+                    for (int j = 0; j < 9; j++) {
+                        if (!isdigit((unsigned char)nif[j])) {
+                            printf("NIF inválido! Apenas números.\n");
+                            valido = 0;
+                            break;
+                        }
+                    }
+                    if (valido) {
+                        for (int k = 0; k < nEmbaixadores; k++) {
+                            if (k != i && strcmp(lista[k].nif, nif) == 0) {
+                                printf("NIF já existe!\n");
+                                valido = 0;
+                                break;
+                            }
+                        }
+                    }
+                    if (valido) {
+                        strcpy(lista[i].nif, nif);
+                        printf("NIF alterado.\n");
+                        break;
+                    }
+                }
+            } else {
+                printf("Opção inválida.\n");
+            }
+            return;
+        }
+    }
+
+    printf("Embaixador não encontrado.\n");
+
 }
